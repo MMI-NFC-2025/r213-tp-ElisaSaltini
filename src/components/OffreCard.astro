@@ -2,13 +2,85 @@
 const { offre } = Astro.props;
 ---
 
-<div class="rounded-lg border border-gray-200 p-4">
-    <h2 class="text-lg font-semibold">{offre.nomMaison}</h2>
-    <p class="text-sm text-gray-600">{offre.adresse}</p>
+<div
+	class={`offre-card rounded-lg border border-gray-200 p-4 transition-all ${
+		offre.favori ? "bg-slate-100" : "bg-white"
+	}`}
+	data-favori={offre.favori.toString()}
+>
+	<div class="flex items-start justify-between gap-3">
+		<h2 class="text-lg font-semibold">{offre.nomMaison}</h2>
 
-    <p class="mt-2 text-sm">
-        {offre.nbChambres} chambres • {offre.nbSdb} sdb • {offre.surface} m²
-    </p>
+		<!-- Etoile = bouton -->
+		<button class="star-button" aria-label="Favori">
+			{offre.favori ? (
+				<!-- étoile pleine -->
+				<svg
+					class="h-6 w-6 text-slate-700"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+				>
+					<path
+						d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+					/>
+				</svg>
+			) : (
+				<!-- étoile contour -->
+				<svg
+					class="h-6 w-6 text-slate-700"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+					/>
+				</svg>
+			)}
+		</button>
+	</div>
 
-    <p class="mt-2 font-semibold">{offre.prix} €</p>
+	<p class="text-sm text-gray-600">{offre.adresse}</p>
+
+	<p class="mt-2 text-sm">
+		{offre.nbChambres} chambres • {offre.nbSdb} sdb • {offre.surface} m²
+	</p>
+
+	<p class="mt-2 font-semibold">{offre.prix} €</p>
 </div>
+
+<script>
+	//@ts-nocheck
+	const cards = document.querySelectorAll(".offre-card");
+
+	cards.forEach((card) => {
+		const starBtn = card.querySelector(".star-button");
+
+		starBtn?.addEventListener("click", (e) => {
+			e.preventDefault();
+
+			// toggle favori (dans le dataset)
+			const isFavori = card.dataset.favori === "true";
+			card.dataset.favori = isFavori ? "false" : "true";
+
+			// toggle couleur de fond
+			card.classList.toggle("bg-slate-100");
+			card.classList.toggle("bg-white");
+
+			// changer l'icône (pleine / contour)
+			starBtn.innerHTML =
+				card.dataset.favori === "true"
+					? `
+          <svg class="h-6 w-6 text-slate-700" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+          </svg>
+        `
+					: `
+          <svg class="h-6 w-6 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+          </svg>
+        `;
+		});
+	});
+</script>

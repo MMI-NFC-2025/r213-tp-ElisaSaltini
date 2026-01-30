@@ -1,0 +1,21 @@
+import PocketBase from "pocketbase";
+const pb = new PocketBase("http://127.0.0.1:8090");
+
+export function getImageUrl(record, imageField) {
+    const file = Array.isArray(record[imageField])
+        ? record[imageField][0]
+        : record[imageField];
+
+    return file ? pb.files.getUrl(record, file) : null;
+}
+
+export async function getOffres() {
+    try {
+        return await pb.collection("maison").getFullList({
+            sort: "-created",
+        });
+    } catch (error) {
+        console.log("Une erreur est survenue en lisant la liste des maisons", error);
+        return [];
+    }
+}

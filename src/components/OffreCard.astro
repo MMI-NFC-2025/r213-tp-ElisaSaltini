@@ -47,11 +47,15 @@ const { offre } = Astro.props;
 		{offre.nbChambres} chambres • {offre.nbSdb} sdb • {offre.surface} m²
 	</p>
 
-	<a href={`/offres/${offre.id}`} class="mt-3 inline-block underline text-sm">
+	<!-- ESPACE PLUS GRAND AVANT LE BOUTON -->
+	<p class="mt-2 mb-4 font-semibold">{offre.prix} €</p>
+
+	<a
+		href={`/offres/${offre.id}`}
+		class="mt-auto rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 text-center"
+	>
 		Voir plus
 	</a>
-
-	<p class="mt-auto font-semibold">{offre.prix} €</p>
 </article>
 
 <script>

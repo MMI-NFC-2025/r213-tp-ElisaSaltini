@@ -1,7 +1,7 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Offrecard from "../components/Offrecard.astro";
-import { getOffres } from "../backend.mjs";
+import Layout from "../../layouts/Layout.astro";
+import Offrecard from "../../components/OffreCard.astro";
+import { getOffres } from "../../backend.mjs";
 
 const offres = await getOffres();
 ---
@@ -22,7 +22,10 @@ const offres = await getOffres();
         <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {
                 offres.map((offre) => (
-                    <div class="offre" data-favori={offre.favori.toString()}>
+                    <div
+                        class="offre"
+                        data-favori={offre.favori?.toString() ?? "false"}
+                    >
                         <Offrecard offre={offre} />
                     </div>
                 ))
@@ -32,6 +35,7 @@ const offres = await getOffres();
 </Layout>
 
 <script>
+    //@ts-nocheck
     const button = document.getElementById("favori-button");
     let showOnlyFavorites = false;
 

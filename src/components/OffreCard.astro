@@ -4,7 +4,7 @@ const { offre } = Astro.props;
 ---
 
 <article
-	class={`offre-card h-full flex flex-col rounded-lg border border-gray-200 p-4 transition-all ${
+	class={`offre-card h-full flex flex-col rounded-lg border border-gray-200 p-4 ${
 		offre.favori ? "bg-slate-100" : "bg-white"
 	}`}
 	data-favori={offre.favori.toString()}
@@ -37,9 +37,9 @@ const { offre } = Astro.props;
 		</button>
 	</header>
 
-	<!-- IMAGE PLUS GRANDE -->
-	<div class="mt-4 h-72 w-full overflow-hidden rounded-md">
-		<PbImages record={offre} imageField="images" width={900} height={600} />
+	<!-- IMAGE : même taille pour toutes -->
+	<div class="mt-4 h-64 w-full overflow-hidden rounded-md">
+		<PbImages record={offre} imageField="images" width={800} height={600} />
 	</div>
 
 	<p class="mt-3 text-sm text-gray-600">{offre.adresse}</p>

@@ -1,20 +1,22 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-import Offrecard from "../../../components/OffreCard.astro";
-import { getOffres } from "../../../backend.mjs";
+import Layout from "../../../../layouts/Layout.astro";
+import Offrecard from "../../../../components/OffreCard.astro";
+import { getOffres } from "../../../../backend.mjs";
 
-const { surface } = Astro.params;
-const minSurface = Number(surface);
+const { min, max } = Astro.params;
+const minPrix = Number(min);
+const maxPrix = Number(max);
 
-const offres = (await getOffres()).filter(
-    (o) => Number(o.surface) > minSurface,
-);
+const offres = (await getOffres()).filter((o) => {
+    const p = Number(o.prix);
+    return p >= minPrix && p <= maxPrix;
+});
 ---
 
-<Layout titre={`Surface > ${minSurface} m²`}>
+<Layout titre={`Prix entre ${minPrix}€ et ${maxPrix}€`}>
     <div class="px-4 py-6">
         <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">
-            Maisons de plus de {minSurface} m²
+            Maisons entre {minPrix} € et {maxPrix} €
         </h1>
 
         <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

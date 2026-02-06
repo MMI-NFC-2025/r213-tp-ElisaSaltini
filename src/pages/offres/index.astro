@@ -8,9 +8,10 @@ const offres = await getOffres();
 
 <Layout titre="Offres">
     <div class="px-4 py-6">
-        <div class="flex flex-col items-start gap-3">
-            <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">OFFRES</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">OFFRES</h1>
 
+        <!-- BOUTONS ALIGNÉS HORIZONTALEMENT -->
+        <div class="flex flex-row flex-wrap items-center gap-3 mb-6">
             <button
                 id="favori-button"
                 class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
@@ -20,17 +21,32 @@ const offres = await getOffres();
 
             <a
                 href="/offres/surface/80"
-                class="rounded-lg bg-slate-500 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
             >
                 Voir les maisons de plus de 80 m²
             </a>
+
+            <a
+                href="/offres/prix/3000"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Voir les maisons à moins de 3000 €
+            </a>
+
+            <a
+                href="/offres/prix/1500/300000000"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Voir les maisons entre 1500 € et 300000000 €
+            </a>
         </div>
 
-        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- CAROUSEL HORIZONTAL (CARDS PLUS LARGES) -->
+        <div class="mt-5 flex gap-6 overflow-x-auto pb-4">
             {
                 offres.map((offre) => (
                     <div
-                        class="offre"
+                        class="offre shrink-0 w-[420px]"
                         data-favori={offre.favori?.toString() ?? "false"}
                     >
                         <Offrecard offre={offre} />

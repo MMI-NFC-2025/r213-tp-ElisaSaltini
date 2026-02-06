@@ -37,7 +37,6 @@ const { offre } = Astro.props;
 		</button>
 	</header>
 
-	<!-- IMAGE : même taille pour toutes -->
 	<div class="mt-4 h-64 w-full overflow-hidden rounded-md">
 		<PbImages record={offre} imageField="images" width={800} height={600} />
 	</div>
@@ -47,6 +46,10 @@ const { offre } = Astro.props;
 	<p class="mt-2 text-sm">
 		{offre.nbChambres} chambres • {offre.nbSdb} sdb • {offre.surface} m²
 	</p>
+
+	<a href={`/offres/${offre.id}`} class="mt-3 inline-block underline text-sm">
+		Voir plus
+	</a>
 
 	<p class="mt-auto font-semibold">{offre.prix} €</p>
 </article>

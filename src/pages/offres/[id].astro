@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getOffre } from "../../backend.mjs";
+
+const { id } = Astro.params;
+const offre = await getOffre(id);
+
+if (!offre) {
+    return new Response("Offre introuvable", { status: 404 });
+}
+---
+
+<Layout titre={offre.nomMaison}>
+    <div class="px-4 py-6">
+        <h2 class="text-3xl font-bold">{offre.nomMaison}</h2>
+
+        <ul class="mt-4 space-y-2">
+            <li><strong>Adresse :</strong> {offre.adresse}</li>
+            <li><strong>Surface :</strong> {offre.surface} m²</li>
+            <li><strong>Chambres :</strong> {offre.nbChambres}</li>
+            <li><strong>SDB :</strong> {offre.nbSdb}</li>
+            <li><strong>Prix :</strong> {offre.prix} €</li>
+        </ul>
+
+        <a href="/offres" class="mt-6 inline-block underline">
+            Retour aux offres
+        </a>
+    </div>
+</Layout>

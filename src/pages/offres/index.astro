@@ -1,14 +1,42 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Offrecard from "../../components/OffreCard.astro";
-import { getOffres } from "../../backend.mjs";
+import { getOffres, filterByPrix } from "../../backend.mjs";
+import { addOffre } from "../../backend.mjs";
 
-const offres = await getOffres();
+let offres;
+let message = "";
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const minPrix = parseInt(data.get("minPrix") as string);
+    const maxPrix = parseInt(data.get("maxPrix") as string);
+
+    if (minPrix > 0 && maxPrix > 0 && maxPrix > minPrix) {
+        console.log(`Filtrage des offres entre ${minPrix}€ et ${maxPrix}€`);
+        offres = await filterByPrix(minPrix, maxPrix);
+        console.log(`Offres trouvées : ${offres.length}`);
+        if (offres.length === 0) {
+            message = `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`;
+        } else {
+            message = `Liste des offres entre ${minPrix}€ et ${maxPrix}€`;
+        }
+    } else {
+        message = "Veuillez entrer des valeurs valides pour le prix.";
+    }
+} else {
+    offres = await getOffres();
+}
 ---
 
 <Layout titre="Offres">
     <div class="px-4 py-6">
         <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">OFFRES</h1>
+
+        <form action="/offres" method="POST" class="space-y-5">
+            <input type="number" name="minPrix" placeholder="Prix minimum" class="border border-gray-300 rounded-md px-3 py-2 mr-2"/>
+            <input type="number" name="maxPrix" placeholder="Prix maximum" class="border border-gray-300 rounded-md px-3 py-2 mr-2"/>
+            <input type="submit" value="Filtrer par prix" class="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800"/>
+        </form>
 
         <div class="flex flex-row flex-wrap items-center gap-3 mb-6">
             <button
@@ -42,7 +70,7 @@ const offres = await getOffres();
 
         <div class="mt-5 flex gap-6 overflow-x-auto pb-4">
             {
-                offres.map((offre) => (
+                offres?.map((offre) => (
                     <div
                         class="offre shrink-0 w-\[420px\]"
                         data-favori={offre.favori?.toString() ?? "false"}

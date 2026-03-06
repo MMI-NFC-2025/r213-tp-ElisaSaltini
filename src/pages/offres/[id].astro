@@ -1,32 +1,65 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getOffre } from "../../backend.mjs";
+import { getOffre, getImageUrl } from "../../backend.mjs";
 
 const { id } = Astro.params;
+
 const offre = await getOffre(id);
 
-if (!offre) {
-    return new Response("Offre introuvable", { status: 404 });
+let imageUrl = null;
+
+if (offre) {
+    imageUrl = getImageUrl(offre, "images");
 }
 ---
 
-<Layout titre={offre.nomMaison}>
-    <div class="px-4 py-6">
-        <h2 class="text-3xl font-bold">{offre.nomMaison}</h2>
-
-        <ul class="mt-4 space-y-2">
-            <li><strong>Adresse :</strong> {offre.adresse}</li>
-            <li><strong>Surface :</strong> {offre.surface} m²</li>
-            <li><strong>Chambres :</strong> {offre.nbChambres}</li>
-            <li><strong>SDB :</strong> {offre.nbSdb}</li>
-            <li><strong>Prix :</strong> {offre.prix} €</li>
-        </ul>
-
+<Layout titre="Détail de l'offre">
+    <div class="px-4 py-6 max-w-5xl mx-auto">
         <a
             href="/offres"
-            class="mt-8 inline-block rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            class="inline-block mb-6 rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
         >
-            Retour aux offres
+            ← Retour aux offres
         </a>
+
+        {
+            offre ? (
+                <>
+                    {imageUrl && (
+                        <img
+                            src={imageUrl}
+                            alt={offre.nomMaison}
+                            class="w-full h-[420px] object-cover rounded-lg mb-6"
+                        />
+                    )}
+
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        {offre.nomMaison}
+                    </h1>
+
+                    <p class="mt-3 text-xl font-semibold">{offre.prix} €</p>
+
+                    <p class="mt-2 text-gray-600">{offre.adresse}</p>
+
+                    <div class="mt-6 space-y-2 text-gray-700">
+                        <p>
+                            <strong>Chambres :</strong> {offre.nbChambres}
+                        </p>
+                        <p>
+                            <strong>Salles de bain :</strong> {offre.nbSdb}
+                        </p>
+                        <p>
+                            <strong>Surface :</strong> {offre.surface} m²
+                        </p>
+                        <p>
+                            <strong>Favori :</strong>{" "}
+                            {offre.favori ? "Oui" : "Non"}
+                        </p>
+                    </div>
+                </>
+            ) : (
+                <p>Offre introuvable.</p>
+            )
+        }
     </div>
 </Layout>

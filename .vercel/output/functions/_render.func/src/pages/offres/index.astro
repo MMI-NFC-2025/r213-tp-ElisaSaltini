@@ -1,0 +1,138 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Offrecard from "../../components/OffreCard.astro";
+import { getOffres, filterByPrix } from "../../backend.mjs";
+import { addOffre } from "../../backend.mjs";
+
+let offres;
+let message = "";
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const minPrix = parseInt(data.get("minPrix") as string);
+    const maxPrix = parseInt(data.get("maxPrix") as string);
+
+    if (minPrix > 0 && maxPrix > 0 && maxPrix > minPrix) {
+        console.log(`Filtrage des offres entre ${minPrix}€ et ${maxPrix}€`);
+        offres = await filterByPrix(minPrix, maxPrix);
+        console.log(`Offres trouvées : ${offres.length}`);
+        if (offres.length === 0) {
+            message = `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`;
+        } else {
+            message = `Liste des offres entre ${minPrix}€ et ${maxPrix}€`;
+        }
+    } else {
+        message = "Veuillez entrer des valeurs valides pour le prix.";
+    }
+} else {
+    offres = await getOffres();
+}
+---
+
+<Layout titre="Offres">
+    <div class="px-4 py-6">
+        <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">OFFRES</h1>
+
+        <form action="/offres" method="POST" class="space-y-5">
+            <input type="number" name="minPrix" placeholder="Prix minimum" class="border border-gray-300 rounded-md px-3 py-2 mr-2"/>
+            <input type="number" name="maxPrix" placeholder="Prix maximum" class="border border-gray-300 rounded-md px-3 py-2 mr-2"/>
+            <input type="submit" value="Filtrer par prix" class="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800"/>
+        </form>
+
+        <div class="flex flex-row flex-wrap items-center gap-3 mb-6">
+            <button
+                id="favori-button"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Afficher les favoris
+            </button>
+
+            <a
+                href="/offres/surface/80"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Voir les maisons de plus de 80 m²
+            </a>
+
+            <a
+                href="/offres/prix/3000"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Voir les maisons à moins de 3000 €
+            </a>
+
+            <a
+                href="/offres/prix/1500/300000000"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+                Voir les maisons entre 1500 € et 300000000 €
+            </a>
+        </div>
+
+        <div class="mt-5 flex gap-6 overflow-x-auto pb-4">
+            {
+                offres?.map((offre) => (
+                    <div
+                        class="offre shrink-0 w-\[420px\]"
+                        data-favori={offre.favori?.toString() ?? "false"}
+                    >
+                        <Offrecard offre={offre} />
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</Layout>
+
+<script>
+    //@ts-nocheck
+    const button = document.getElementById("favori-button");
+    let showOnlyFavorites = false;
+
+    button?.addEventListener("click", () => {
+        showOnlyFavorites = !showOnlyFavorites;
+        const offres = document.querySelectorAll(".offre");
+
+        offres.forEach((offre) => {
+            const isFavori = offre.dataset.favori === "true";
+
+            if (showOnlyFavorites) {
+                offre.style.display = isFavori ? "block" : "none";
+                button.textContent = "Afficher tout";
+            } else {
+                offre.style.display = "block";
+                button.textContent = "Afficher les favoris";
+            }
+        });
+    });
+
+    const cards = document.querySelectorAll(".offre-card");
+
+    cards.forEach((card) => {
+        const toggle = card.querySelector(".favori-toggle");
+        if (!toggle) return;
+
+        toggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const isFavori = card.dataset.favori === "true";
+            card.dataset.favori = isFavori ? "false" : "true";
+
+            card.classList.toggle("bg-indigo-100");
+            card.classList.toggle("bg-gray-100");
+
+            toggle.textContent = isFavori ? "Standard" : "Favori";
+            toggle.classList.toggle("bg-indigo-800");
+            toggle.classList.toggle("text-white");
+            toggle.classList.toggle("bg-slate-200");
+            toggle.classList.toggle("text-indigo-950");
+
+            const wrapper = card.closest(".offre");
+            if (wrapper) wrapper.dataset.favori = card.dataset.favori;
+
+            if (showOnlyFavorites && wrapper) {
+                wrapper.style.display =
+                    card.dataset.favori === "true" ? "block" : "none";
+            }
+        });
+    });
+</script>

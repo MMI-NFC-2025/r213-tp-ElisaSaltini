@@ -1,28 +1,174 @@
 ---
-import { addOffre } from "../../backend.mjs";
+import Layout from "../../layouts/Layout.astro";
+import { addOffre, getAgents } from "../../backend.mjs";
+
+const agents = await getAgents();
 
 let message = "";
+let erreur = false;
+
 if (Astro.request.method === "POST") {
-    const formData = await Astro.request.formData();
-    const response = await addOffre(formData);
-    message = response.message;
+    const data = await Astro.request.formData();
+
+    const nomMaison = data.get("nomMaison");
+    const prix = Number(data.get("prix"));
+    const adresse = data.get("adresse");
+    const nbChambres = Number(data.get("nbChambres"));
+    const nbSdb = Number(data.get("nbSdb"));
+    const surface = Number(data.get("surface"));
+    const Agent = data.get("Agent");
+    const images = data.get("images");
+
+    const nouvelleOffre = {
+        nomMaison,
+        prix,
+        adresse,
+        nbChambres,
+        nbSdb,
+        surface,
+        Agent,
+        favori: false,
+    };
+
+    if (images && images.size > 0) {
+        nouvelleOffre.images = images;
+    }
+
+    const resultat = await addOffre(nouvelleOffre);
+    message = resultat.message;
+    erreur = !resultat.success;
 }
 ---
 
-<h1 class="text-lg">Ajouter une offre</h1>
-{ message && <p class="text-red-600"> {message} </p>}
-<form action="/offres/add" method="POST" enctype="multipart/form-data">
-    <input
-        type="text"
-        name="nomMaison"
-        placeholder="Nom de la maison"
-        required
-        class="w-full mt-2 p-2 border border-gray-300 rounded-md"
-    />
-    <input type="number" name="prix" placeholder="Prix" />
-    <input type="number" name="nbSdb" placeholder="Nombre de salles de bain" />
-    <input type="number" name="nbChambres" placeholder="Nombre de chambres" />
-    <input type="number" name="surface" placeholder="Superficie" />
-    <input type="file" name="images" />
-    <button type="submit">Ajouter</button>
-</form>
+<Layout titre="Ajouter une offre">
+    <div class="px-4 py-6">
+        <h1 class="mb-6 text-4xl font-bold text-gray-900">AJOUTER UNE OFFRE</h1>
+
+        {
+            message && (
+                <p
+                    class={`mb-4 rounded-lg p-3 ${erreur ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}
+                >
+                    {message}
+                </p>
+            )
+        }
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="max-w-2xl space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
+            <div>
+                <label
+                    for="nomMaison"
+                    class="mb-1 block font-semibold text-gray-700"
+                    >Nom de la maison</label
+                >
+                <input
+                    type="text"
+                    name="nomMaison"
+                    id="nomMaison"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label for="prix" class="mb-1 block font-semibold text-gray-700"
+                    >Prix</label
+                >
+                <input
+                    type="number"
+                    name="prix"
+                    id="prix"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label
+                    for="adresse"
+                    class="mb-1 block font-semibold text-gray-700"
+                    >Adresse</label
+                >
+                <input
+                    type="text"
+                    name="adresse"
+                    id="adresse"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label
+                    for="nbChambres"
+                    class="mb-1 block font-semibold text-gray-700"
+                    >Nombre de chambres</label
+                >
+                <input
+                    type="number"
+                    name="nbChambres"
+                    id="nbChambres"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label
+                    for="nbSdb"
+                    class="mb-1 block font-semibold text-gray-700"
+                    >Nombre de salles de bain</label
+                >
+                <input
+                    type="number"
+                    name="nbSdb"
+                    id="nbSdb"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label
+                    for="surface"
+                    class="mb-1 block font-semibold text-gray-700"
+                    >Surface</label
+                >
+                <input
+                    type="number"
+                    name="surface"
+                    id="surface"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            <div>
+                <label
+                    for="images"
+                    class="mb-1 block font-semibold text-gray-700">Image</label
+                >
+                <input
+                    type="file"
+                    name="images"
+                    id="images"
+                    accept="image/*"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+            </div>
+
+            
+
+            <button
+                type="submit"
+                class="rounded-lg bg-slate-700 px-4 py-2 font-semibold text-white hover:bg-slate-800"
+            >
+                Ajouter
+            </button>
+        </form>
+    </div>
+</Layout>
